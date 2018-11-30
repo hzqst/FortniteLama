@@ -31,9 +31,9 @@ the pre-compiled bins are in /build folder
 8.use .bat to do an infinite loop
 
 ## 批话不多说自己看吧
-1、确保游戏分辨率为1920x1080
+1、确保游戏分辨率为1920x1080，游戏为窗口模式且最大化（不是无边框！！）
 
-2、确保游戏为窗口模式且最大化（不是无边框！！）
+2、确保你是win10，win7就别来了我们早就试过不能用了
 
 3、确保WEGAME切到堡垒的页面（也就是右下角有启动游戏按钮）
 
