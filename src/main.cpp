@@ -208,6 +208,102 @@ void SetForeground(HWND hWnd)
 	SetFocus(hWnd);
 }
 
+int GetTierMap(const cv::Mat &fn_t1, const cv::Mat &fn_t2, const cv::Mat &fn_t3, const cv::Mat &fn_t4)
+{
+	int currentTier = 0;
+	bool bBreak = false;
+
+	if (!DIBSnapshot(GetDesktopWindow(), 100, [&fn_t1, &fn_t2, &fn_t3, &fn_t4, &bBreak, &currentTier](void *pBuffer, size_t cbBuffer, int width, int height, int bbp) {
+
+		cv::Mat snap;
+
+		if (!DIBToCvMat(snap, pBuffer, cbBuffer, width, height, bbp))
+		{
+			bBreak = true;
+			OutputDebugStringA("Failed to DIBToCvMat");
+			return;
+		}
+
+		cv::Mat found(width, height, CV_32FC1);
+		cv::matchTemplate(snap, fn_t1, found, cv::TM_CCOEFF_NORMED);
+
+		double minVal = -1;
+		double maxVal = 0;
+		cv::Point minLoc;
+		cv::Point maxLoc;
+		cv::Point matchLoc;
+
+		cv::minMaxLoc(found, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+
+		if (maxVal < 0.96)
+		{
+			cv::matchTemplate(snap, fn_t2, found, cv::TM_CCOEFF_NORMED);
+
+			double minVal = -1;
+			double maxVal = 0;
+			cv::Point minLoc;
+			cv::Point maxLoc;
+			cv::Point matchLoc;
+
+			cv::minMaxLoc(found, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+			if (maxVal < 0.96)
+			{
+				cv::matchTemplate(snap, fn_t3, found, cv::TM_CCOEFF_NORMED);
+
+				double minVal = -1;
+				double maxVal = 0;
+				cv::Point minLoc;
+				cv::Point maxLoc;
+				cv::Point matchLoc;
+
+				cv::minMaxLoc(found, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+				if (maxVal < 0.96)
+				{
+					cv::matchTemplate(snap, fn_t4, found, cv::TM_CCOEFF_NORMED);
+
+					double minVal = -1;
+					double maxVal = 0;
+					cv::Point minLoc;
+					cv::Point maxLoc;
+					cv::Point matchLoc;
+
+					cv::minMaxLoc(found, &minVal, &maxVal, &minLoc, &maxLoc, cv::Mat());
+					if (maxVal < 0.96)
+					{
+
+					}
+					else
+					{
+						currentTier = 4;
+						bBreak = true;
+					}
+				}
+				else
+				{
+					currentTier = 3;
+					bBreak = true;
+				}
+			}
+			else
+			{
+				currentTier = 2;
+				bBreak = true;
+			}
+		}
+		else
+		{
+			currentTier = 1;
+			bBreak = true;
+		}
+	}))
+	{
+		OutputDebugStringA("Failed to DIBSnapshot");
+		return 0;
+	}
+
+	return currentTier;
+}
+
 bool CheckException(ULONG64 lastTick)
 {
 	HWND hwndTPWarning = FindWindowW(L"#32770", L"¾¯¸æÂë (3, 1015, 91001)");
@@ -289,6 +385,38 @@ void GetLama()
 	if (!fn_team.size)
 	{
 		OutputDebugStringA("Failed to load fn_team.png");
+		return;
+	}
+
+	auto fn_t1 = cv::imread("fn_t1.png");
+
+	if (!fn_t1.size)
+	{
+		OutputDebugStringA("Failed to load fn_t1.png");
+		return;
+	}
+
+	auto fn_t2 = cv::imread("fn_t2.png");
+
+	if (!fn_t2.size)
+	{
+		OutputDebugStringA("Failed to load fn_t2.png");
+		return;
+	}
+
+	auto fn_t3 = cv::imread("fn_t3.png");
+
+	if (!fn_t3.size)
+	{
+		OutputDebugStringA("Failed to load fn_t3.png");
+		return;
+	}
+
+	auto fn_t4 = cv::imread("fn_t4.png");
+
+	if (!fn_t4.size)
+	{
+		OutputDebugStringA("Failed to load fn_t4.png");
 		return;
 	}
 
@@ -587,39 +715,44 @@ gameStarted:
 
 	Sleep(1500);
 
-	SetCursorPos(left + 1355, top + 620);
+	while (1)
+	{
+		auto tier = GetTierMap(fn_t1, fn_t2, fn_t3, fn_t4);
+		if (tier >= 1 && tier < 4)
+		{
+			SetCursorPos(left + 150, top + 260);
+			Sleep(50);
+			SimMouseClick(TRUE);
+			Sleep(50);
+			SimMouseClick(FALSE);
+			Sleep(50);
+		}
+		else if(tier == 4)
+		{
+			SetCursorPos(left + 1600, top + 900);
+			Sleep(50);
+			SimMouseClick(TRUE);
+			Sleep(50);
+			SimMouseClick(FALSE);
+			Sleep(50);
+			break;
+		}
+		else
+		{
+			Sleep(300);
+		}
+	}
 
+	Sleep(3000);
+
+	SetCursorPos(left + 1600, top + 900);
 	Sleep(100);
+	SimMouseClick(TRUE);
+	Sleep(50);
+	SimMouseClick(FALSE);
+	Sleep(50);
 
-	SimMouseClick(TRUE);
-	Sleep(50);
-	SimMouseClick(FALSE);
-	Sleep(50);
-	SimMouseClick(TRUE);
-	Sleep(50);
-	SimMouseClick(FALSE);
-	Sleep(50);
-	SimMouseClick(TRUE);
-	Sleep(50);
-	SimMouseClick(FALSE);
-
-	Sleep(3500);
-
-	SetCursorPos(left + 964, top + 674);
-
-	Sleep(100);
-
-	SimMouseClick(TRUE);
-	Sleep(50);
-	SimMouseClick(FALSE);
-	Sleep(50);
-	SimMouseClick(TRUE);
-	Sleep(50);
-	SimMouseClick(FALSE);
-	Sleep(50);
-	SimMouseClick(TRUE);
-	Sleep(50);
-	SimMouseClick(FALSE);
+	SetCursorPos(left + 500, top + 500);
 
 	Sleep(3000);
 
