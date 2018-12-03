@@ -50,3 +50,5 @@ the pre-compiled bins are in /build folder
 9、开羊脚本是这个→无限开小羊.bat 保证你在战利品的羊驼购买页再用
 
 10、把cmd黑窗口关了 任务管理器结束lama.exe 退出脚本
+
+2018/12/03 解决偶尔进错图的问题
